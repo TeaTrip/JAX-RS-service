@@ -1,0 +1,3 @@
+com\wishmaster\ifmo\ws\jaxrs\J2EEServer\PostgreeSQLDAO.class
+com\wishmaster\ifmo\ws\jaxrs\J2EEServer\MovieResource.class
+com\wishmaster\ifmo\ws\jaxrs\J2EEServer\Movie.class
