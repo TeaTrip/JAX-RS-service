@@ -19,7 +19,7 @@ public class App {
         Client client = Client.create();
         printList(selectAll(client));
         System.out.println();
-        System.out.println(selectById(client, 7));
+        System.out.println(selectById(client, 21));
         System.out.println();
         printList(selectByYear(client, 1999));
         System.out.println();
@@ -36,6 +36,10 @@ public class App {
         printList(selectByYearAndGenre(client, "2007", "hi"));
         System.out.println();
         printList(selectByRatingAndGenre(client, "8", "so good"));
+        System.out.println(createNewMovie(client, "Futurama", 1998, 8, "Comedy", "Noname"));
+        System.out.println();
+        System.out.println(updateMovie(client, 19, "FIlM", 1998, 8, "just film", "wow"));
+        System.out.println(deleteMovie(client, 23));
     }
     
    /* private static List<Movie> selectAll(Client client)
@@ -195,6 +199,31 @@ public class App {
         GenericType<List<Movie>> type = new GenericType<List<Movie>>() {};
         return response.getEntity(type);
     }
+
+
+    private static Movie createNewMovie(Client client, String name, int year, int rating, String genre, String director){
+        WebResource webResource = client.resource(URL + "/createNewMovie");
+        Movie movie = new Movie(0,year,rating,name,genre,director);
+        ClientResponse response = webResource.accept(MediaType.APPLICATION_JSON).type(MediaType.APPLICATION_JSON).post(ClientResponse.class,  movie);
+        GenericType<Movie> type = new GenericType<Movie>() {};
+        return response.getEntity(type);
+    }
+
+    private static Movie updateMovie(Client client, int id, String name, int year, int rating, String genre, String director){
+        WebResource webResource = client.resource(URL + "/updateMovie");
+        Movie movie = new Movie(id,year,rating,name,genre,director);
+        ClientResponse response = webResource.accept(MediaType.APPLICATION_JSON).type(MediaType.APPLICATION_JSON).put(ClientResponse.class,  movie);
+        GenericType<Movie> type = new GenericType<Movie>() {};
+        return response.getEntity(type);
+    }
+
+    private static int deleteMovie(Client client, int id){
+        WebResource webResource = client.resource(URL + "/deleteMovie/" + id);
+        ClientResponse response = webResource.accept(MediaType.APPLICATION_JSON).delete(ClientResponse.class);
+        GenericType<List<Movie>> type = new GenericType<List<Movie>>() {};
+        return response.getStatus();
+    }
+
 
     private static void printList(List<Movie> movies) {
         for (Movie movie : movies) {
