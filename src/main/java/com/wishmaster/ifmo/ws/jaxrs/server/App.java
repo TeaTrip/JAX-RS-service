@@ -2,6 +2,7 @@ package com.wishmaster.ifmo.ws.jaxrs.server;
 
 import com.sun.jersey.api.container.grizzly2.GrizzlyServerFactory;
 import com.sun.jersey.api.core.ClassNamesResourceConfig;
+import com.sun.jersey.api.core.PackagesResourceConfig;
 import com.sun.jersey.api.core.ResourceConfig;
 import java.io.IOException;
 import java.net.URI;
@@ -16,7 +17,7 @@ public class App {
         HttpServer server = null;
         try {
             ResourceConfig resourceConfig = new
-                    ClassNamesResourceConfig(MovieResource.class);
+                    PackagesResourceConfig(MovieResource.class.getPackage().getName());
             server = GrizzlyServerFactory.createHttpServer(BASE_URI,
                     resourceConfig);
             server.start();

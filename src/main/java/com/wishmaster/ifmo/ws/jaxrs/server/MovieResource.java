@@ -79,24 +79,44 @@ public class MovieResource {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ MediaType.APPLICATION_JSON })
-    public Movie createNewMovie(Movie movie) {
+    public Movie createNewMovie(Movie movie) throws IllegalParameterException {
+        if(movie.getName() == null || movie.getName().trim().isEmpty())
+            throw new IllegalParameterException("name is not specified");
+        if(movie.getYear() < 0)
+            throw new IllegalParameterException("year cannot be negative");
+        if(movie.getRating() < 1 && movie.getRating() > 10)
+            throw new IllegalParameterException("rating should be in 1 to 10 range");
+        if(movie.getGenre() == null || movie.getGenre().trim().isEmpty())
+            throw new IllegalParameterException("genre is not specified");
+        if(movie.getDirector() == null || movie.getDirector().trim().isEmpty())
+            throw new IllegalParameterException("director is not specified");
         movie.setId(0);
-        System.out.println(movie);
-        //Movie movie = new Movie(0, _movie.getYear(), _movie.getRating(), _movie.getName(), _movie.getGenre(), _movie.getDirector());
         int movieId = dbMovie.createNewMovie(movie);
         return dbMovie.selectById(movieId);
     }
 
     @Path("/updateMovie")
     @PUT
-    public Movie updateMovie(Movie movie) {
+    public Movie updateMovie(Movie movie) throws IllegalParameterException {
+        if(dbMovie.selectById(movie.getId()).getId() == 0)
+            throw new IllegalParameterException("Row with this id not found");
+        if(movie.getYear() < 0)
+            throw new IllegalParameterException("year cannot be negative");
+        if(movie.getRating() < 1 && movie.getRating() > 10)
+            throw new IllegalParameterException("rating should be in 1 to 10 range");
+        if(movie.getGenre() == null || movie.getGenre().trim().isEmpty())
+            throw new IllegalParameterException("genre is not specified");
+        if(movie.getDirector() == null || movie.getDirector().trim().isEmpty())
+            throw new IllegalParameterException("director is not specified");
         dbMovie.updateMovie(movie);
         return dbMovie.selectById(movie.getId());
     }
 
     @Path("/deleteMovie/{id}")
     @DELETE
-    public Response deleteMovie(@PathParam("id") int id){
+    public Response deleteMovie(@PathParam("id") int id) throws IllegalParameterException{
+        if(dbMovie.selectById(id).getId() == 0)
+            throw new IllegalParameterException("Row with this id not found");
         int statuscode = dbMovie.deleteMovie(id);
         if (statuscode == 1){
             return Response.status(Response.Status.OK).build();

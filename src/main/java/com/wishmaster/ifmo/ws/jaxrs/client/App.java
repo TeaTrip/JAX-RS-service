@@ -11,6 +11,8 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+
 public class App {
     private static final String URL =
             "http://localhost:8080/rest/movie";
@@ -39,7 +41,7 @@ public class App {
         System.out.println(createNewMovie(client, "Futurama", 1998, 8, "Comedy", "Noname"));
         System.out.println();
         System.out.println(updateMovie(client, 19, "FIlM", 1998, 8, "just film", "wow"));
-        System.out.println(deleteMovie(client, 23));
+        System.out.println(deleteMovie(client, 250));
     }
     
    /* private static List<Movie> selectAll(Client client)
@@ -205,6 +207,10 @@ public class App {
         WebResource webResource = client.resource(URL + "/createNewMovie");
         Movie movie = new Movie(0,year,rating,name,genre,director);
         ClientResponse response = webResource.accept(MediaType.APPLICATION_JSON).type(MediaType.APPLICATION_JSON).post(ClientResponse.class,  movie);
+        if (response.getStatus() !=
+                ClientResponse.Status.OK.getStatusCode()) {
+            throw new IllegalStateException(response.getEntity(String.class));
+        }
         GenericType<Movie> type = new GenericType<Movie>() {};
         return response.getEntity(type);
     }
@@ -213,6 +219,10 @@ public class App {
         WebResource webResource = client.resource(URL + "/updateMovie");
         Movie movie = new Movie(id,year,rating,name,genre,director);
         ClientResponse response = webResource.accept(MediaType.APPLICATION_JSON).type(MediaType.APPLICATION_JSON).put(ClientResponse.class,  movie);
+        if (response.getStatus() !=
+                ClientResponse.Status.OK.getStatusCode()) {
+            throw new IllegalStateException(response.getEntity(String.class));
+        }
         GenericType<Movie> type = new GenericType<Movie>() {};
         return response.getEntity(type);
     }
@@ -221,6 +231,10 @@ public class App {
         WebResource webResource = client.resource(URL + "/deleteMovie/" + id);
         ClientResponse response = webResource.accept(MediaType.APPLICATION_JSON).delete(ClientResponse.class);
         GenericType<List<Movie>> type = new GenericType<List<Movie>>() {};
+        if (response.getStatus() !=
+                ClientResponse.Status.OK.getStatusCode()) {
+            throw new IllegalStateException(response.getEntity(String.class));
+        }
         return response.getStatus();
     }
 
