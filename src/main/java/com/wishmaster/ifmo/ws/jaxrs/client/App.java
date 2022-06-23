@@ -19,6 +19,7 @@ public class App {
 
     public static void main(String[] args) {
         Client client = Client.create();
+        Credential credential = new Credential("root", "admin");
         printList(selectAll(client));
         System.out.println();
         System.out.println(selectById(client, 21));
@@ -38,10 +39,10 @@ public class App {
         printList(selectByYearAndGenre(client, "2007", "hi"));
         System.out.println();
         printList(selectByRatingAndGenre(client, "8", "so good"));
-        System.out.println(createNewMovie(client, "Futurama", 1998, 8, "Comedy", "Noname"));
+        System.out.println(createNewMovie(client, "Futurama", 1998, 8, "Comedy", "Noname", credential.getAuthString()));
         System.out.println();
-        System.out.println(updateMovie(client, 19, "FIlM", 1998, 8, "just film", "wow"));
-        System.out.println(deleteMovie(client, 250));
+        System.out.println(updateMovie(client, 19, "FIlM", 1998, 8, "just film", "wow", credential.getAuthString()));
+        System.out.println(deleteMovie(client, 250, credential.getAuthString()));
     }
     
    /* private static List<Movie> selectAll(Client client)
@@ -203,10 +204,10 @@ public class App {
     }
 
 
-    private static Movie createNewMovie(Client client, String name, int year, int rating, String genre, String director){
+    private static Movie createNewMovie(Client client, String name, int year, int rating, String genre, String director, String credential){
         WebResource webResource = client.resource(URL + "/createNewMovie");
         Movie movie = new Movie(0,year,rating,name,genre,director);
-        ClientResponse response = webResource.accept(MediaType.APPLICATION_JSON).type(MediaType.APPLICATION_JSON).post(ClientResponse.class,  movie);
+        ClientResponse response = webResource.accept(MediaType.APPLICATION_JSON).type(MediaType.APPLICATION_JSON).header("Authorization", credential).post(ClientResponse.class,  movie);
         if (response.getStatus() !=
                 ClientResponse.Status.OK.getStatusCode()) {
             throw new IllegalStateException(response.getEntity(String.class));
@@ -215,10 +216,10 @@ public class App {
         return response.getEntity(type);
     }
 
-    private static Movie updateMovie(Client client, int id, String name, int year, int rating, String genre, String director){
+    private static Movie updateMovie(Client client, int id, String name, int year, int rating, String genre, String director, String credential){
         WebResource webResource = client.resource(URL + "/updateMovie");
         Movie movie = new Movie(id,year,rating,name,genre,director);
-        ClientResponse response = webResource.accept(MediaType.APPLICATION_JSON).type(MediaType.APPLICATION_JSON).put(ClientResponse.class,  movie);
+        ClientResponse response = webResource.accept(MediaType.APPLICATION_JSON).type(MediaType.APPLICATION_JSON).header("Authorization", credential).put(ClientResponse.class,  movie);
         if (response.getStatus() !=
                 ClientResponse.Status.OK.getStatusCode()) {
             throw new IllegalStateException(response.getEntity(String.class));
@@ -227,9 +228,10 @@ public class App {
         return response.getEntity(type);
     }
 
-    private static int deleteMovie(Client client, int id){
+    private static int deleteMovie(Client client, int id, String credential){
         WebResource webResource = client.resource(URL + "/deleteMovie/" + id);
-        ClientResponse response = webResource.accept(MediaType.APPLICATION_JSON).delete(ClientResponse.class);
+        webResource.header("Authorization", credential);
+        ClientResponse response = webResource.accept(MediaType.APPLICATION_JSON).header("Authorization", credential).delete(ClientResponse.class);
         GenericType<List<Movie>> type = new GenericType<List<Movie>>() {};
         if (response.getStatus() !=
                 ClientResponse.Status.OK.getStatusCode()) {

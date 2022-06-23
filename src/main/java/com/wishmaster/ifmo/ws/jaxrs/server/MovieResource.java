@@ -2,7 +2,9 @@ package com.wishmaster.ifmo.ws.jaxrs.server;
 
 import java.util.List;
 
+import javax.resource.spi.work.SecurityContext;
 import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -79,7 +81,10 @@ public class MovieResource {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ MediaType.APPLICATION_JSON })
-    public Movie createNewMovie(Movie movie) throws IllegalParameterException {
+    public Movie createNewMovie(@HeaderParam("Authorization") String credential, Movie movie) throws IllegalParameterException {
+        if(credential == null || !credential.equals("Basic cm9vdDphZG1pbg==")){
+            throw new IllegalParameterException("Auth failed, plc check login/password");
+        }
         if(movie.getName() == null || movie.getName().trim().isEmpty())
             throw new IllegalParameterException("name is not specified");
         if(movie.getYear() < 0)
@@ -97,7 +102,10 @@ public class MovieResource {
 
     @Path("/updateMovie")
     @PUT
-    public Movie updateMovie(Movie movie) throws IllegalParameterException {
+    public Movie updateMovie(@HeaderParam("Authorization") String credential, Movie movie) throws IllegalParameterException {
+        if(credential == null || !credential.equals("Basic cm9vdDphZG1pbg==")){
+            throw new IllegalParameterException("Auth failed, plc check login/password");
+        }
         if(dbMovie.selectById(movie.getId()).getId() == 0)
             throw new IllegalParameterException("Row with this id not found");
         if(movie.getYear() < 0)
@@ -114,7 +122,10 @@ public class MovieResource {
 
     @Path("/deleteMovie/{id}")
     @DELETE
-    public Response deleteMovie(@PathParam("id") int id) throws IllegalParameterException{
+    public Response deleteMovie(@HeaderParam("Authorization") String credential, @PathParam("id") int id) throws IllegalParameterException{
+        if(credential == null || !credential.equals("Basic cm9vdDphZG1pbg==")){
+            throw new IllegalParameterException("Auth failed, plc check login/password");
+        }
         if(dbMovie.selectById(id).getId() == 0)
             throw new IllegalParameterException("Row with this id not found");
         int statuscode = dbMovie.deleteMovie(id);
